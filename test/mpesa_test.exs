@@ -1,17 +1,17 @@
 defmodule MpesaTest do
   use ExUnit.Case
   doctest Mpesa
-
-  test "make_withdrawal/2 fails if client pin is true and withdrawal amount is false" do
-    assert Mpesa.make_withdrawal(@pin, 2000) == {:error, "Incorrect pin, re_enter pin"}
+  @pin 1234
+  test "make_withdrawal/2 fails if client pin is correct and withdrawal amount is more than initial amount" do
+    assert Mpesa.make_withdrawal(@pin, 2000) == {:error, "limited funds"}
   end
 
-  test "make_withdrawal/2 successful if client pin is true and withdrawal amount is true" do
-    assert Mpesa.make_withdrawal(@pin, 1000) == {:error, "Incorrect pin, re_enter pin"}
+  test "make_withdrawal/2 successful if client pin is correct and withdrawal amount is equal to or less than initial amount" do
+    assert Mpesa.make_withdrawal(1234, 1000) == {:ok, "successful. New balance is new_bal"}
   end
 
-  test "make_withdrawal/2 successful if withdrawal amount is less than initial bal" do
-    assert Mpesa.make_withdrawal(@pin, 200) == {:error, "Incorrect pin, re_enter pin"}
+  test "make_withdrawal/2 fails if client pin is correct withdrawal amount is less than initial bal" do
+    assert Mpesa.make_withdrawal(1111, 200) == {:error, "Incorrect pin, re_enter pin"}
   end
 
     test "send_money/1 fails if send amount is more than initial bal" do

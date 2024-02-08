@@ -8,9 +8,7 @@ defmodule Mpesa do
   def make_withdrawal(client_pin, withdrawal_amount) do
     case {client_pin == @pin, @initial_bal >= withdrawal_amount} do
         {true, true} ->
-          {:ok, "successful"}
-          @initial_bal - withdrawal_amount
-          # {:ok, "successful"}
+          {:ok, "successful. New balance is new_bal"}
         {false, _} ->
           {:error, "Incorrect pin, re_enter pin"}
         {true, false} ->
