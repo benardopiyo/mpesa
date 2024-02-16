@@ -1,40 +1,45 @@
 defmodule MpesaTest do
   use ExUnit.Case
+  import ExUnit.CaptureIO
+
   doctest Mpesa
-  @pin 1234
-  test "make_withdrawal/2 fails if client pin is correct and withdrawal amount is more than initial amount" do
-    assert Mpesa.make_withdrawal(@pin, 2000) == {:error, "limited funds"}
+
+  setup do
+    capture_io( ["0700000000", "30000000", "1234"], fn ->
+      Mpesa.open_account()
+    end)
+    []
   end
 
-  test "make_withdrawal/2 successful if client pin is correct and withdrawal amount is equal to or less than initial amount" do
-    assert Mpesa.make_withdrawal(1234, 1000) == {:ok, "successful. New balance is new_bal"}
+  test "initial balance is 0" do
+
+
+
+
+    assert Mpesa.balance() == "Your current balance is 0"
   end
 
-  test "make_withdrawal/2 fails if client pin is correct withdrawal amount is less than initial bal" do
-    assert Mpesa.make_withdrawal(1111, 200) == {:error, "Incorrect pin, re_enter pin"}
+  test "deposit/1" do
+
+    assert Mpesa.balance() == "Your current balance is 0"
+    Mpesa.deposit(100)
+    assert Mpesa.balance() == "Your current balance is 100"
+    Mpesa.deposit(200)
+    assert Mpesa.balance == "Your current balance is 300"
   end
 
-    test "send_money/1 fails if send amount is more than initial bal" do
-      assert Mpesa.send_money(3000) == "limited funds"
-    end
+  test "withdraw/1 with sufficient balance" do
 
-    test "send_money/1 fails if send amount is equal to initial bal" do
-      assert Mpesa.send_money(1000) == "limited funds"
-    end
+    assert Mpesa.balance() == "Your current balance is 0"
+    Mpesa.deposit(100)
+    Mpesa.withdraw(50)
+    assert Mpesa.balance() == "Your current balance is 50"
+  end
 
-    test "send_money/1 is successful if send amount is less than initial bal" do
-      assert Mpesa.send_money(400) == 600
-    end
+  test "withdraw/1 with insufficient balance" do
 
-    test "make_deposit/1 successful if deposit amount is more than initial bal" do
-      assert Mpesa.make_deposit(1500) == 2500
-    end
+    assert Mpesa.withdraw(50) == "Failed insufficient funds"
 
-    test "make_deposit/1 successful if deposit amount is less than initial bal" do
-      assert Mpesa.make_deposit(500) == 1500
-    end
-
-    test "make_deposit/1 successful if deposit amount is equal to initial bal" do
-      assert Mpesa.make_deposit(1000) == 2000
-    end
- end
+    assert Mpesa.balance() == "Your current balance is 0"
+  end
+end
